@@ -1,0 +1,135 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Parameters:
+  LatestAmiId:
+    Type: String
+    Default: 'ami-077e31c4939f6a2f3'
+    Description: AMIs ID
+  InstanceTypeParameter:
+    Type: String
+    Default: t2.micro
+    AllowedValues:
+      - t2.micro
+      - m1.small
+      - m1.large
+    Description: Enter t2.micro, m1.small, or m1.large. Default is t2.micro.
+  MyKeyPair: 
+    Description: Amazon EC2 Key Pair
+    Type: "AWS::EC2::KeyPair::KeyName"
+    Default: 'aws'
+  MaxSizeASG:
+    Description: "Enter the max size for the ASG"
+    Type: String
+    Default: '3'
+  MinSizeASG:
+    Description: "Enter the min size for the ASG"
+    Type: String
+    Default: '2'
+  DesiredCapacityASG:
+    Description: "Enter the desired capacity for the ASG"
+    Type: String
+    Default: '2'
+Resources:
+  MyVPC:
+    Type: 'AWS::EC2::VPC'
+    Properties:
+      CidrBlock: "172.28.0.0/16"
+      EnableDnsSupport: true
+      EnableDnsHostnames: true
+      InstanceTenancy: default
+  
+  MyVPCEC2SecurityGroup:
+    Type: 'AWS::EC2::SecurityGroup'
+    Properties:
+      GroupDescription: Public instance security group
+      VpcId: !Ref MyVPC
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: '22'
+          ToPort: '22'
+          CidrIp: 0.0.0.0/0
+        - IpProtocol: "tcp"
+          FromPort: '80'
+          ToPort: '80'
+          CidrIp: 0.0.0.0/0
+  
+  PublicSubnet:
+    Type: 'AWS::EC2::Subnet'
+    Properties:
+      CidrBlock: "172.28.0.0/16"
+      AvailabilityZone: "us-east-2a"
+      MapPublicIpOnLaunch: true
+      VpcId: !Ref MyVPC
+
+  MyInternetGateway:
+    Type: 'AWS::EC2::InternetGateway'
+
+  MyAttachGateway:
+    Type: 'AWS::EC2::VPCGatewayAttachment'
+    Properties:
+      VpcId: !Ref MyVPC
+      InternetGatewayId: !Ref MyInternetGateway
+
+  MyRouteTable:
+    Type: 'AWS::EC2::RouteTable'
+    Properties:
+      VpcId: !Ref MyVPC
+
+  MyRoute:
+    Type: 'AWS::EC2::Route'
+    DependsOn: MyInternetGateway
+    Properties:
+      RouteTableId: !Ref MyRouteTable
+      DestinationCidrBlock: 0.0.0.0/0
+      GatewayId: !Ref MyInternetGateway
+
+  MySubnetRouteTableAssociation:
+    Type: 'AWS::EC2::SubnetRouteTableAssociation'
+    Properties:
+      SubnetId: !Ref PublicSubnet
+      RouteTableId: !Ref MyRouteTable
+
+  MyLaunchTemplate:
+    Type: AWS::EC2::LaunchTemplate
+    Metadata: 
+      AWS::CloudFormation::Init: 
+        config:
+          packages:
+            yum:
+              - "java-1.8.0-openjdk": []
+          files:
+            /var/www/html/test.txt:
+              content: test
+    Properties:
+      LaunchTemplateData: 
+        ImageId: !Ref LatestAmiId
+        InstanceType: !Ref InstanceTypeParameter
+        SecurityGroupIds:
+          - !Ref MyVPCEC2SecurityGroup
+        KeyName: !Ref MyKeyPair
+        UserData:
+          Fn::Base64:
+            !Sub |
+              #!/bin/bash -xe
+              yum -y install java-1.8.0-openjdk
+
+  MyASG:
+    Type: AWS::AutoScaling::AutoScalingGroup
+    DependsOn:
+      - MySubnetRouteTableAssociation
+    Properties:
+      MinSize: !Ref MinSizeASG
+      MaxSize: !Ref MaxSizeASG
+      DesiredCapacity: !Ref DesiredCapacityASG
+      LaunchTemplate:
+        LaunchTemplateId: !Ref MyLaunchTemplate
+        Version:
+          Fn::GetAtt: [ MyLaunchTemplate, LatestVersionNumber ]
+      AvailabilityZones:
+        Fn::GetAZs: "us-east-2a"
+      VPCZoneIdentifier:
+        - !Ref PublicSubnet
+
+Outputs:
+  AutoScalingGroupID:
+    Description: The AutoScalingGroup ID
+    Value: !Ref MyASG
