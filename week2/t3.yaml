@@ -1,0 +1,138 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: EC2 with S3
+Parameters:
+  InstanceTypeParameter:
+    Type: String
+    Default: t2.micro
+    AllowedValues:
+      - t2.micro
+      - m1.small
+      - m1.large
+    Description: Enter t2.micro, m1.small, or m1.large. Default is t2.micro.
+  
+  MyKeyPair: 
+    Description: Amazon EC2 Key Pair
+    Type: "AWS::EC2::KeyPair::KeyName"
+    Default: 'aws'
+
+  MyBucket:
+    Type: String
+    Default: dadamenko-test-bucket
+    Description: Enter S3 bucket name.
+
+Resources:
+  MyEC2Instance:
+    Type: "AWS::EC2::Instance"
+    DependsOn:
+      - MySubnetRouteTableAssociation
+    Properties:
+      IamInstanceProfile: !Ref RootInstanceProfile
+      ImageId: "ami-077e31c4939f6a2f3"
+      InstanceType:
+        Ref: InstanceTypeParameter
+      SecurityGroupIds:
+        - !Ref myVPCEC2SecurityGroup
+      KeyName: !Ref MyKeyPair
+      SubnetId: !Ref PublicSubnet
+      UserData:
+        Fn::Base64:
+          !Sub |
+            #!/bin/bash -xe
+            curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+            unzip awscliv2.zip
+            ./aws/install
+            aws s3 cp s3://dadamenko-test-bucket . --recursive
+
+  myVPC:
+    Type: 'AWS::EC2::VPC'
+    Properties:
+      CidrBlock: "172.28.0.0/16"
+      EnableDnsSupport: true
+      EnableDnsHostnames: true
+      InstanceTenancy: default
+
+  myVPCEC2SecurityGroup:
+    Type: 'AWS::EC2::SecurityGroup'
+    Properties:
+      GroupDescription: Public instance security group
+      VpcId: !Ref myVPC
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: '22'
+          ToPort: '22'
+          CidrIp: 0.0.0.0/0
+        - IpProtocol: "tcp"
+          FromPort: '80'
+          ToPort: '80'
+          CidrIp: 0.0.0.0/0
+
+  PublicSubnet:
+    Type: 'AWS::EC2::Subnet'
+    Properties:
+      CidrBlock: "172.28.0.0/16"
+      AvailabilityZone: "us-east-2a"
+      MapPublicIpOnLaunch: true
+      VpcId: !Ref myVPC
+
+  MyInternetGateway:
+    Type: 'AWS::EC2::InternetGateway'
+
+  MyAttachGateway:
+    Type: 'AWS::EC2::VPCGatewayAttachment'
+    Properties:
+      VpcId: !Ref myVPC
+      InternetGatewayId: !Ref MyInternetGateway
+
+  MyRouteTable:
+    Type: 'AWS::EC2::RouteTable'
+    Properties:
+      VpcId: !Ref myVPC
+
+  MyRoute:
+    Type: 'AWS::EC2::Route'
+    DependsOn: MyInternetGateway
+    Properties:
+      RouteTableId: !Ref MyRouteTable
+      DestinationCidrBlock: 0.0.0.0/0
+      GatewayId: !Ref MyInternetGateway
+
+  MySubnetRouteTableAssociation:
+    Type: 'AWS::EC2::SubnetRouteTableAssociation'
+    Properties:
+      SubnetId: !Ref PublicSubnet
+      RouteTableId: !Ref MyRouteTable
+
+
+  RootInstanceProfile:
+    Type: AWS::IAM::InstanceProfile
+    Properties:
+      Path: /
+      Roles:
+        - !Ref S3WritableRole
+  S3WritableRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: ec2.amazonaws.com
+            Action: sts:AssumeRole
+      Path: /
+      Policies:
+        - PolicyName: s3access
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: Allow
+                Action: 's3:*'
+                Resource: '*'
+
+Outputs:
+  InstanceID:
+    Description: The Instance ID
+    Value: !Ref MyEC2Instance
+  InstanceIP:
+    Description: The instance public IP
+    Value: !GetAtt [ MyEC2Instance, PublicIp ]
