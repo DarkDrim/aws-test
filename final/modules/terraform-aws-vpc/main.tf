@@ -50,7 +50,7 @@ resource "aws_nat_gateway" "nat" {
   count = 1
   allocation_id = aws_eip.nat[0].id
 
-  subnet_id     = aws_subnet.public[0].id
+  subnet_id     = aws_subnet.public[count.index].id
 
   tags = {
     Name      = var.name
@@ -66,8 +66,8 @@ resource "aws_nat_gateway" "nat" {
 }
 
 resource "aws_subnet" "public" {
-  count = 1
-  cidr_block              = cidrsubnet(var.cidr_block, 4, 2)
+  count = 2
+  cidr_block              = cidrsubnet(var.cidr_block, 4, 0 + count.index)
   map_public_ip_on_launch = true
   vpc_id                  = aws_vpc.this[0].id
 
@@ -113,7 +113,7 @@ resource "aws_route" "public" {
 }
 
 resource "aws_route_table_association" "public" {
-  count = 1
+  count = 2
   route_table_id = aws_route_table.public[0].id
   subnet_id      = aws_subnet.public[count.index].id
 
@@ -123,8 +123,8 @@ resource "aws_route_table_association" "public" {
 }
 
 resource "aws_subnet" "private" {
-  count = 1
-  cidr_block              = cidrsubnet(var.cidr_block, 4, 4)
+  count = 2
+  cidr_block              = cidrsubnet(var.cidr_block, 4, 2 + count.index)
   map_public_ip_on_launch = false
   vpc_id                  = aws_vpc.this[0].id
 
@@ -171,7 +171,7 @@ resource "aws_route" "private" {
 }
 
 resource "aws_route_table_association" "private" {
-  count = 1
+  count = 2
   route_table_id = aws_route_table.private[0].id
   subnet_id      = aws_subnet.private[count.index].id
 
