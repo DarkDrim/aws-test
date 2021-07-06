@@ -11,7 +11,7 @@ terraform {
 
 provider "aws" {
   profile = "default"
-  region  = "us-east-2"
+  region  = "us-west-2"
 }
 
 resource "aws_instance" "app_server" {
@@ -26,5 +26,6 @@ resource "aws_instance" "app_server" {
 module "network" {
   source = "./modules/terraform-aws-vpc"
 
-  base_cidr_block = "10.0.0.0/8"
+  name = "VPC"
+  cidr_block = "10.0.0.0/16"
 }
