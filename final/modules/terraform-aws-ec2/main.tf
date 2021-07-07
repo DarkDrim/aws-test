@@ -28,11 +28,23 @@ resource "aws_security_group" "allow_ssh" {
   }
 }
 
+resource "aws_instance" "bastion_instance" {
+  ami           = var.image_id
+  instance_type = var.instance_type
+  key_name = var.key_name
+  vpc_security_group_ids = [aws_security_group.allow_ssh.id]
+  subnet_id = module.vpc.public_subnets[0]
+
+  tags = {
+    Name = "bastion-instance"
+  }
+}
+
 resource "aws_instance" "private_server" {
   ami           = var.image_id
   instance_type = var.instance_type
   key_name = var.key_name
-  security_groups = [aws_security_group.allow_ssh.id]
+  vpc_security_group_ids = [aws_security_group.allow_ssh.id]
   subnet_id = module.vpc.private_subnets[0]
 
   tags = {
