@@ -1,5 +1,5 @@
 output "vpc" {
-  value = try(aws_vpc.this[0], null)
+  value = aws_vpc.this[0].id
 }
 
 output "nat_gateway" {
@@ -11,4 +11,9 @@ output "subnets" {
     public  = try(aws_subnet.public, null)
     private = try(aws_subnet.private, null)
   }
+}
+
+output "public_subnets" {
+  description = "Public subnets"
+  value       = aws_subnet.public.*.id
 }
