@@ -70,6 +70,7 @@ resource "aws_subnet" "public" {
   cidr_block              = cidrsubnet(var.cidr_block, 4, 0 + count.index)
   map_public_ip_on_launch = true
   vpc_id                  = aws_vpc.this[0].id
+  availability_zone = "us-west-2a"
 
   tags = {
     Name = var.name
@@ -127,6 +128,7 @@ resource "aws_subnet" "private" {
   cidr_block              = cidrsubnet(var.cidr_block, 4, 2 + count.index)
   map_public_ip_on_launch = false
   vpc_id                  = aws_vpc.this[0].id
+  availability_zone = "us-west-2a"
 
   tags = {
     Name = var.name

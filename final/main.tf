@@ -14,15 +14,6 @@ provider "aws" {
   region  = "us-west-2"
 }
 
-//resource "aws_instance" "app_server" {
-//  ami           = "ami-0721c9af7b9b75114"
-//  instance_type = "t2.micro"
-//
-//  tags = {
-//    Name = var.instance_name
-//  }
-//}
-
 module "network" {
   source = "./modules/terraform-aws-vpc"
 
@@ -34,4 +25,10 @@ module "asg" {
   source = "./modules/terraform-aws-asg"
 
   name = "ASG"
+}
+
+module "ec2" {
+  source = "./modules/terraform-aws-ec2"
+
+  name = "Private EC2 instance"
 }
