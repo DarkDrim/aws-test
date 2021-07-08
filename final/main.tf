@@ -40,3 +40,15 @@ module "dynamodb" {
 module "rds" {
   source = "./modules/terraform-aws-rds"
 }
+
+module "sns" {
+  source = "./modules/terraform-aws-sns"
+}
+
+module "sqs" {
+  source = "./modules/terraform-aws-sqs"
+}
+
+module "elb" {
+  source = "./modules/terraform-aws-elb"
+}
