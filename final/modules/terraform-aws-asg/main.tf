@@ -82,11 +82,6 @@ resource "aws_iam_policy" "instance_policy" {
         Resource = "*"
       },
       {
-        Action   = ["rds:*"]
-        Effect   = "Allow"
-        Resource = "*"
-      },
-      {
         Action   = ["sqs:*"]
         Effect   = "Allow"
         Resource = "*"

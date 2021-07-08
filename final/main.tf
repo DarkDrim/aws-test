@@ -36,3 +36,7 @@ module "ec2" {
 module "dynamodb" {
   source = "./modules/terraform-aws-dynamodb"
 }
+
+module "rds" {
+  source = "./modules/terraform-aws-rds"
+}
