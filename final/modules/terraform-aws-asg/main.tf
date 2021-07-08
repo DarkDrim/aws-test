@@ -23,6 +23,14 @@ resource "aws_security_group" "allow_ssh_http" {
     cidr_blocks      = ["0.0.0.0/0"]
   }
 
+  ingress {
+    description      = "HTTPS"
+    from_port        = 443
+    to_port          = 443
+    protocol         = "tcp"
+    cidr_blocks      = ["0.0.0.0/0"]
+  }
+
   egress {
     from_port        = 0
     to_port          = 0
@@ -70,6 +78,21 @@ resource "aws_iam_policy" "instance_policy" {
       },
       {
         Action   = ["dynamodb:*"]
+        Effect   = "Allow"
+        Resource = "*"
+      },
+      {
+        Action   = ["rds:*"]
+        Effect   = "Allow"
+        Resource = "*"
+      },
+      {
+        Action   = ["sqs:*"]
+        Effect   = "Allow"
+        Resource = "*"
+      },
+      {
+        Action   = ["sns:*"]
         Effect   = "Allow"
         Resource = "*"
       },
