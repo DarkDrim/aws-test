@@ -11,7 +11,7 @@ resource "aws_db_subnet_group" "db_subnet" {
   }
 }
 
-resource "aws_db_instance" "education" {
+resource "aws_db_instance" "lohikards" {
   identifier             = var.identifier
   instance_class         = var.instance_class
   allocated_storage      = var.allocated_storage
