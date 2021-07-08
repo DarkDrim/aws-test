@@ -1,11 +1,7 @@
-module "vpc" {
-  source = "./../terraform-aws-vpc"
-}
-
 resource "aws_security_group" "allow_ssh_http" {
   name        = "allow_ssh_http"
   description = "Allow SSH & HTTP inbound traffic"
-  vpc_id      = module.vpc.vpc
+  vpc_id      = var.vpc_id
 
   ingress {
     description      = "SSH"
@@ -128,7 +124,7 @@ resource "aws_autoscaling_group" "group" {
   health_check_type         = "ELB"
   desired_capacity          = 2
   force_delete              = true
-  vpc_zone_identifier       = module.vpc.public_subnets
+  vpc_zone_identifier       = var.subnet_ids
 
   launch_template {
     id      = aws_launch_template.instance.id

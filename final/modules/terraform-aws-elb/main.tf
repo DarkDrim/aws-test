@@ -1,19 +1,11 @@
-module "vpc" {
-  source = "./../terraform-aws-vpc"
-}
-
-module "asg" {
-  source = "./../terraform-aws-asg"
-}
-
 resource "aws_autoscaling_attachment" "asg_attachment_elb" {
-  autoscaling_group_name = module.asg.autoscaling_group_id
+  autoscaling_group_name = var.autoscaling_group_id
   elb                    = aws_elb.this.id
 }
 
 resource "aws_elb" "this" {
   name            = var.name
-  subnets         = module.vpc.public_subnets
+  subnets         = var.public_subnet_ids
   internal        = var.internal
 
   //security_groups = var.security_groups

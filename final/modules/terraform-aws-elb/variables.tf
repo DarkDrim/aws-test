@@ -33,3 +33,14 @@ variable "connection_draining_timeout" {
   type        = number
   default     = 300
 }
+
+variable "public_subnet_ids" {
+  description = "A list of public VPC subnet IDs"
+  type        = list(string)
+  default     = []
+}
+
+variable "autoscaling_group_id" {
+  description = "Autoscaling group ID"
+  type        = string
+}

@@ -21,3 +21,20 @@ variable "key_name" {
   type        = string
   default     = "aws"
 }
+
+variable "vpc_id" {
+  description = "VPC ID"
+  type        = string
+}
+
+variable "public_subnet_ids" {
+  description = "A list of public VPC subnet IDs"
+  type        = list(string)
+  default     = []
+}
+
+variable "private_subnet_ids" {
+  description = "A list of private VPC subnet IDs"
+  type        = list(string)
+  default     = []
+}

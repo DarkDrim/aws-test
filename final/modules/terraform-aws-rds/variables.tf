@@ -51,3 +51,9 @@ variable "port" {
   type        = number
   default     = 5432
 }
+
+variable "private_subnet_ids" {
+  description = "A list of private VPC subnet IDs"
+  type        = list(string)
+  default     = []
+}

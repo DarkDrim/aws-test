@@ -1,10 +1,6 @@
-module "vpc" {
-  source = "./../terraform-aws-vpc"
-}
-
 resource "aws_db_subnet_group" "db_subnet" {
   name       = "db_subnet"
-  subnet_ids = module.vpc.private_subnets
+  subnet_ids = var.private_subnet_ids
 
   tags = {
     Name = "DB Subnet"

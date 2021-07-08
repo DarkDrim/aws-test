@@ -1,11 +1,7 @@
-module "vpc" {
-  source = "./../terraform-aws-vpc"
-}
-
 resource "aws_security_group" "allow_ssh" {
   name        = "allow_ssh"
   description = "Allow SSH inbound traffic"
-  vpc_id      = module.vpc.vpc
+  vpc_id      = var.vpc_id
 
   ingress {
     description      = "SSH"
@@ -99,7 +95,7 @@ resource "aws_instance" "bastion_instance" {
   instance_type = var.instance_type
   key_name = var.key_name
   vpc_security_group_ids = [aws_security_group.allow_ssh.id]
-  subnet_id = module.vpc.public_subnets[0]
+  subnet_id = var.public_subnet_ids[0]
 
   tags = {
     Name = "bastion-instance"
@@ -111,7 +107,7 @@ resource "aws_instance" "private_server" {
   instance_type = var.instance_type
   key_name = var.key_name
   vpc_security_group_ids = [aws_security_group.allow_ssh.id]
-  subnet_id = module.vpc.private_subnets[0]
+  subnet_id = var.private_subnet_ids[0]
   iam_instance_profile = aws_iam_instance_profile.instance_profile.id
 
   user_data = filebase64("${path.module}/init.sh")

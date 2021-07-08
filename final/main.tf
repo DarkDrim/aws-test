@@ -25,12 +25,17 @@ module "asg" {
   source = "./modules/terraform-aws-asg"
 
   name = "ASG"
+  vpc_id = module.network.vpc
+  subnet_ids = module.network.public_subnets
 }
 
 module "ec2" {
   source = "./modules/terraform-aws-ec2"
 
   name = "Private EC2 instance"
+  vpc_id = module.network.vpc
+  public_subnet_ids = module.network.public_subnets
+  private_subnet_ids = module.network.private_subnets
 }
 
 module "dynamodb" {
@@ -39,6 +44,8 @@ module "dynamodb" {
 
 module "rds" {
   source = "./modules/terraform-aws-rds"
+
+  private_subnet_ids = module.network.private_subnets
 }
 
 module "sns" {
@@ -51,4 +58,7 @@ module "sqs" {
 
 module "elb" {
   source = "./modules/terraform-aws-elb"
+
+  public_subnet_ids = module.network.public_subnets
+  autoscaling_group_id = module.asg.autoscaling_group_id
 }
