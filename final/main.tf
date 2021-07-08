@@ -32,3 +32,7 @@ module "ec2" {
 
   name = "Private EC2 instance"
 }
+
+module "dynamodb" {
+  source = "./modules/terraform-aws-dynamodb"
+}
