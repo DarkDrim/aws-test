@@ -126,7 +126,7 @@ resource "aws_route_table_association" "public" {
 
 resource "aws_subnet" "private" {
   count = 2
-  cidr_block              = cidrsubnet(var.cidr_block, 4, 2 + count.index)
+  cidr_block              = cidrsubnet(var.cidr_block, 4, 4 + count.index)
   map_public_ip_on_launch = false
   vpc_id                  = aws_vpc.this[0].id
   //availability_zone = "us-west-2a"

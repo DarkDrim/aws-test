@@ -28,7 +28,7 @@ resource "aws_elb" "this" {
     unhealthy_threshold = 2
     target              = "HTTP:80/actuator/health"
     interval            = 30
-    timeout             = 30
+    timeout             = 10
   }
 
   tags = {
