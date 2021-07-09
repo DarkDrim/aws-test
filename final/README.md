@@ -9,6 +9,12 @@ terraform validate
 terraform apply
 ```
 
+To find sensitive outputs use:
+```bash
+terraform output rds_host
+terraform output rds_username
+```
+
 Run into public subnets:
 ```bash
 sudo su
