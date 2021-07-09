@@ -110,7 +110,7 @@ resource "aws_instance" "private_server" {
   subnet_id = var.private_subnet_ids[0]
   iam_instance_profile = aws_iam_instance_profile.instance_profile.id
 
-  user_data = filebase64("${path.module}/init.sh")
+  user_data_base64 = filebase64("${path.module}/init.sh")
 
   tags = {
     Name = var.name

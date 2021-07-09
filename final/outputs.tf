@@ -12,3 +12,15 @@ output "elb_url" {
   description = "ELB DNS name"
   value       = module.elb.elb_dns_name
 }
+
+output "rds_host" {
+  description = "RDS hostname"
+  value       = module.rds.rds_hostname
+  sensitive   = true
+}
+
+output "rds_username" {
+  description = "RDS username"
+  value       = module.rds.rds_username
+  sensitive   = true
+}
