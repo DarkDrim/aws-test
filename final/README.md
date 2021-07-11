@@ -27,8 +27,7 @@ Run into private subnet:
 sudo su
 cd /
 # set environment variable RDS_HOST with correct RDS address
-RDS_HOST=<rds_host>
-java -jar persist3-0.0.1-SNAPSHOT.jar
+RDS_HOST=<rds_host> java -jar persist3-0.0.1-SNAPSHOT.jar
 ```
 
 On your local machine, you need to have java 8.
@@ -70,4 +69,15 @@ Response example
         "rootuser"
     ]
 ]
+```
+
+Connect
+```bash
+psql -h lohikadb.cfs4xvpnoisn.us-west-2.rds.amazonaws.com -U rootuser EduLohikaTrainingAwsRds --password
+# pwd: rootuser
+```
+
+Query:
+```sql
+SELECT * FROM LOGS;
 ```
