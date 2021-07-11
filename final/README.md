@@ -15,6 +15,8 @@ terraform output rds_host
 terraform output rds_username
 ```
 
+Add SNS subscription (email) using AWS console.
+
 Run into public subnets:
 ```bash
 sudo su
