@@ -40,3 +40,34 @@ docker run --rm -it client bash
 
 $> java -cp calc-client-1.0-SNAPSHOT-jar-with-dependencies.jar CalcClient <ELB’s DNS name>
 ```
+
+Scan items from dynamodb:
+SSH to public instance
+
+```bash
+aws dynamodb scan --table-name edu-lohika-training-aws-dynamodb
+```
+
+Connect to RSD:
+SSH to private instance from public
+
+User rootuser
+Pwd rootuser
+Table LOGS
+
+Get DB instances
+```bash
+aws rds describe-db-instances --filters "Name=engine,Values=postgres" --query "*[].[DBInstanceIdentifier,Endpoint.Address,Endpoint.Port,MasterUsername]"
+```
+
+Response example
+```text
+[
+    [
+        "lohikadb",
+        "lohikadb.cfs4xvpnoisn.us-west-2.rds.amazonaws.com",
+        5432,
+        "rootuser"
+    ]
+]
+```

@@ -27,6 +27,7 @@ module "asg" {
   name = "ASG"
   vpc_id = module.network.vpc
   subnet_ids = module.network.public_subnets
+  lb_group_arns = module.elb.lb_tg_arn
 }
 
 module "ec2" {
@@ -45,6 +46,7 @@ module "dynamodb" {
 module "rds" {
   source = "./modules/terraform-aws-rds"
 
+  vpc_id = module.network.vpc
   private_subnet_ids = module.network.private_subnets
 }
 
@@ -59,6 +61,8 @@ module "sqs" {
 module "elb" {
   source = "./modules/terraform-aws-elb"
 
+  vpc_id = module.network.vpc
   public_subnet_ids = module.network.public_subnets
   autoscaling_group_id = module.asg.autoscaling_group_id
+  autoscaling_security_group_id = module.asg.autoscaling_security_group_id
 }

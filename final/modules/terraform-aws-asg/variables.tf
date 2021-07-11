@@ -32,3 +32,9 @@ variable "subnet_ids" {
   type        = list(string)
   default     = []
 }
+
+variable "lb_group_arns" {
+  description = "A list of LB group arns"
+  type        = list(string)
+  default     = []
+}

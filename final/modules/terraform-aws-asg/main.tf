@@ -126,6 +126,8 @@ resource "aws_autoscaling_group" "group" {
   force_delete              = true
   vpc_zone_identifier       = var.subnet_ids
 
+  //target_group_arns         = var.lb_group_arns
+
   launch_template {
     id      = aws_launch_template.instance.id
     version = "$Latest"

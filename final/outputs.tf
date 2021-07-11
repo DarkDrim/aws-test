@@ -10,7 +10,7 @@ output "instance_private_ip" {
 
 output "elb_url" {
   description = "ELB DNS name"
-  value       = module.elb.elb_dns_name
+  value       = module.elb.lb_dns_name
 }
 
 output "rds_host" {

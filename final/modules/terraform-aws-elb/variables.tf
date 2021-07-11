@@ -22,16 +22,9 @@ variable "idle_timeout" {
   default     = 60
 }
 
-variable "connection_draining" {
-  description = "Boolean to enable connection draining"
-  type        = bool
-  default     = false
-}
-
-variable "connection_draining_timeout" {
-  description = "The time in seconds to allow for connections to drain"
-  type        = number
-  default     = 300
+variable "vpc_id" {
+  description = "VPC ID"
+  type        = string
 }
 
 variable "public_subnet_ids" {
@@ -42,5 +35,10 @@ variable "public_subnet_ids" {
 
 variable "autoscaling_group_id" {
   description = "Autoscaling group ID"
+  type        = string
+}
+
+variable "autoscaling_security_group_id" {
+  description = "Autoscaling security group ID"
   type        = string
 }
